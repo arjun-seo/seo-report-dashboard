@@ -1,0 +1,75 @@
+{
+  "site": { "name": "Bonvoice" },
+  "months": [
+    {
+      "month": "2026-09",
+      "label": "September 2026",
+      "clicks": 20831,
+      "brandClicks": 1937,
+      "nonBrandClicks": 18894,
+      "organicSearchSessions": 14751,
+      "totalOrganicSessions": 17002,
+      "impressions": null,
+      "ctr": null,
+      "avgPosition": null,
+      "healthScore": null,
+      "devices": null,
+      "aiReferrals": null,
+      "leads": {
+        "total": 106,
+        "byPage": { "Blogs": 49, "Home page": 45, "Service pages": 5, "Pricing page": 6, "Contact page": 1 }
+      },
+      "rankings": {
+        "date": "2026-10-01",
+        "items": [
+          { "keyword": "virtual number for whatsapp", "volume": 5400, "position": 28 },
+          { "keyword": "Business Phone Number", "volume": 1300, "position": 3 },
+          { "keyword": "ivr service provider", "volume": 1000, "position": 1 },
+          { "keyword": "IVR Service", "volume": 700, "position": 5 },
+          { "keyword": "call management", "volume": 590, "position": 55 },
+          { "keyword": "IVR solutions", "volume": 480, "position": 3 },
+          { "keyword": "cloud telephony providers", "volume": 390, "position": 1 },
+          { "keyword": "Cloud Telephony Solutions", "volume": 210, "position": 1 },
+          { "keyword": "cloud telephony providers in india", "volume": 170, "position": 1 },
+          { "keyword": "voice broadcasting service", "volume": 150, "position": 27 },
+          { "keyword": "IVR solution Provider", "volume": 140, "position": 2 }
+        ]
+      }
+    },
+    {
+      "month": "2026-10",
+      "label": "October 2026",
+      "clicks": 1867,
+      "brandClicks": 955,
+      "nonBrandClicks": 912,
+      "organicSearchSessions": 1663,
+      "totalOrganicSessions": 2847,
+      "impressions": 116000,
+      "ctr": 1.6,
+      "avgPosition": 20,
+      "healthScore": 96,
+      "devices": { "desktop": 66.0, "mobile": 33.5, "tablet": 0.5 },
+      "aiReferrals": { "ChatGPT": 22, "Claude": 0, "Perplexity": 0 },
+      "leads": {
+        "total": 56,
+        "byPage": { "Blogs": 19, "Home page": 20, "Service pages": 9, "Pricing page": 3, "Contact page": 2 }
+      },
+      "rankings": {
+        "date": "2026-11-02",
+        "items": [
+          { "keyword": "virtual number for whatsapp", "volume": 5400, "position": 26 },
+          { "keyword": "Business Phone Number", "volume": 1300, "position": 3 },
+          { "keyword": "ivr service provider", "volume": 1000, "position": 2 },
+          { "keyword": "IVR Service", "volume": 700, "position": 5 },
+          { "keyword": "call management", "volume": 590, "position": 15 },
+          { "keyword": "IVR solutions", "volume": 480, "position": 13 },
+          { "keyword": "cloud telephony providers", "volume": 390, "position": 3 },
+          { "keyword": "Cloud Telephony Solutions", "volume": 210, "position": 31 },
+          { "keyword": "cloud telephony providers in india", "volume": 170, "position": 1 },
+          { "keyword": "voice broadcasting service", "volume": 150, "position": 53 },
+          { "keyword": "IVR solution Provider", "volume": 140, "position": 3 }
+        ]
+      }
+    }
+  ]
+}

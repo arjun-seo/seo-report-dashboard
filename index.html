@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>SEO Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <header>
+      <div class="eyebrow" id="eyebrow">SEO</div>
+      <h1 id="title">Loading…</h1>
+      <p class="lede" id="lede"></p>
+    </header>
+    <div class="controls">
+      <label class="sub" for="month">Month</label>
+      <select id="month"></select>
+      <a class="btn secondary" href="admin.html">Add / edit month</a>
+    </div>
+  </div>
+
+  <section class="kpis" id="kpi-main" aria-label="Headline changes"></section>
+  <section class="kpis second" id="kpi-gsc" aria-label="Search Console and site health"></section>
+
+  <div class="row">
+    <section class="panel">
+      <h2>Where the clicks went</h2>
+      <p class="sub">Organic clicks from Google, brand vs non-brand search</p>
+      <div class="bars" id="mix"></div>
+      <div class="legend" id="mix-legend"></div>
+      <p class="note" id="mix-note"></p>
+    </section>
+    <div class="stackcol">
+      <section class="panel">
+        <h2>Traffic by device</h2>
+        <p class="sub" id="dev-sub">Share of organic traffic</p>
+        <div id="dev"></div>
+      </section>
+      <section class="panel">
+        <h2>Referrals from AI assistants</h2>
+        <p class="sub" id="ai-sub">Sessions</p>
+        <div id="ai"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2>Trend by month</h2>
+    <p class="sub">Every month in the history file, up to and including the one selected</p>
+    <div class="charts" id="charts"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Keyword rankings</h2>
+    <p class="sub" id="kw-sub">Google position. Lower is better. Sorted by monthly search volume.</p>
+    <div class="chips" id="chips" role="group" aria-label="Filter keywords"></div>
+    <div class="tbl">
+      <table>
+        <thead id="kw-head"></thead>
+        <tbody id="kw"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Organic leads by page type</h2>
+    <p class="sub">Leads attributed to organic search</p>
+    <div class="bars" id="leads"></div>
+    <div class="legend" id="leads-legend"></div>
+    <p class="note" id="leads-note"></p>
+  </section>
+
+  <section class="panel">
+    <h2>All months</h2>
+    <p class="sub">Select a row to open that month</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Month</th><th class="r">Clicks</th><th class="r">Brand</th><th class="r">Non-brand</th><th class="r">Search sessions</th><th class="r">Leads</th><th class="r">Impressions</th><th class="r">Avg. position</th></tr></thead>
+      <tbody id="history"></tbody>
+    </table></div>
+  </section>
+
+  <footer><span id="foot"></span></footer>
+</div>
+<div id="tip" role="tooltip"></div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Monthly Entry</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <header>
+      <div class="eyebrow">SEO dashboard</div>
+      <h1>Add or edit a month</h1>
+      <p class="lede">Fill in the figures, download the updated data file, and upload it over <code>data/months.json</code> on your server. The dashboard picks it up on the next page load.</p>
+    </header>
+    <a class="btn secondary" href="index.html">Back to dashboard</a>
+  </div>
+
+  <section class="panel">
+    <h2>1. Choose the month</h2>
+    <div id="draft"></div>
+    <div class="form-grid">
+      <div class="field"><label for="pick">Month to edit</label><select id="pick"></select></div>
+      <div class="field"><label for="month">Month</label><input type="month" id="month"><span class="hint">Pick the reporting month.</span></div>
+      <div class="field"><label for="load">Load a different data file</label><input type="file" id="load" accept=".json,application/json"><span class="hint">Optional. The current file loads automatically.</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Search traffic</h2>
+    <div class="form-grid" id="f-main"></div>
+    <div id="warn-main"></div>
+  </section>
+
+  <section class="panel">
+    <h2>3. Devices and AI referrals</h2>
+    <p class="sub">Leave blank if you don't have it this month.</p>
+    <div class="form-grid" id="f-dev"></div>
+  </section>
+
+  <section class="panel">
+    <h2>4. Organic leads by page type</h2>
+    <div class="form-grid"><div class="field"><label for="leadTotal">Reported total leads</label><input type="number" id="leadTotal" step="any"></div></div>
+    <div id="lead-rows"></div>
+    <p style="margin:10px 0 0"><button type="button" class="btn secondary small" id="add-lead">Add page type</button></p>
+    <div id="warn-leads"></div>
+  </section>
+
+  <section class="panel">
+    <h2>5. Keyword rankings</h2>
+    <p class="sub">A new month starts with last month's keywords and blank positions. Add or remove keywords as your tracking list changes.</p>
+    <div class="form-grid"><div class="field"><label for="rankDate">Rank check date</label><input type="date" id="rankDate"></div></div>
+    <div id="kw-rows"></div>
+    <p style="margin:10px 0 0"><button type="button" class="btn secondary small" id="add-kw">Add keyword</button></p>
+  </section>
+
+  <section class="panel">
+    <h2>6. Save</h2>
+    <div class="controls">
+      <button type="button" class="btn" id="save">Save month</button>
+      <button type="button" class="btn secondary" id="download">Download months.json</button>
+    </div>
+    <div id="status"></div>
+    <ol class="steps">
+      <li>Press <b>Save month</b> to add it to the working copy (kept in this browser until you download).</li>
+      <li>Press <b>Download months.json</b>.</li>
+      <li>Upload it to your server, replacing <code>data/months.json</code>.</li>
+    </ol>
+    <details style="margin-top:14px"><summary class="sub" style="cursor:pointer">Preview file contents</summary><textarea id="preview" readonly aria-label="months.json preview"></textarea></details>
+  </section>
+</div>
+<script src="admin.js"></script>
+</body>
+</html>

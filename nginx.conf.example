@@ -1,0 +1,22 @@
+# Example Nginx server block for the SEO dashboard.
+# 1. Create a password file:  sudo htpasswd -c /etc/nginx/.seo-dashboard-htpasswd yourname
+# 2. Put the folder at /var/www/seo-dashboard
+# 3. Add HTTPS with certbot:  sudo certbot --nginx -d seo.example.com
+
+server {
+    listen 80;
+    server_name seo.example.com;
+
+    root /var/www/seo-dashboard;
+    index index.html;
+
+    auth_basic "SEO dashboard";
+    auth_basic_user_file /etc/nginx/.seo-dashboard-htpasswd;
+
+    add_header X-Robots-Tag "noindex, nofollow" always;
+
+    # Always serve the latest figures after an upload
+    location /data/ {
+        add_header Cache-Control "no-store";
+    }
+}
