@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Monthly Entry</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+:root { --on-bad: #ffffff; --attn: #b97a00; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --on-bad: #0b0b0b; --attn: #fab219; } }
+:root[data-theme="dark"] { --on-bad: #0b0b0b; --attn: #fab219; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.danger { background: var(--bad); border-color: var(--bad); color: var(--on-bad); }
+.btn.secondary.warn-text { color: var(--bad); }
+.actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+td.r.acts { white-space: nowrap; }
+.pubbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--attn); border-radius: 10px; padding: 12px 16px; }
+.pubbar[hidden] { display: none; }
+.pubbar span { min-width: 0; flex: 1 1 280px; }
+.modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,0.55); }
+.modal[hidden] { display: none; }
+.modal-box { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: 12px; }
+.modal-box h2 { text-wrap: balance; }
+.modal-box p { margin: 0; }
+.cf-code { font-size: 28px; font-weight: 600; letter-spacing: 0.02em; }
+.modal-box input { width: 100%; font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <header>
+      <div class="eyebrow">SEO dashboard</div>
+      <h1>Add or edit a month</h1>
+      <p class="lede">Add a new month, change an old one, or move one to the trash. Changes stay in this browser until you download <code>months.json</code> and upload it to GitHub.</p>
+    </header>
+    <a class="btn secondary" href="index.html">Back to dashboard</a>
+  </div>
+
+  <div class="pubbar" id="pubbar" hidden>
+    <span><b>Not published yet.</b> Your changes are saved only in this browser. Download months.json, then on GitHub use Add file, then Upload files, so the dashboard shows them.</span>
+    <button type="button" class="btn small" id="download-top">Download months.json</button>
+  </div>
+
+  <div id="draft"></div>
+
+  <section class="panel">
+    <h2>Reports</h2>
+    <p class="sub">Edit a month, or move it to the trash.</p>
+    <div id="rep-msg"></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Month</th><th class="r">Clicks</th><th class="r">Leads</th><th class="r">Actions</th></tr></thead>
+      <tbody id="rep-rows"></tbody>
+    </table></div>
+    <p style="margin:12px 0 0"><button type="button" class="btn secondary small" id="new-report">Add a new month</button></p>
+  </section>
+
+  <section class="panel">
+    <h2>Trash</h2>
+    <p class="sub">Deleted reports wait here. Restore puts a report back. Delete forever removes it for good.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Month</th><th>Deleted on</th><th class="r">Actions</th></tr></thead>
+      <tbody id="trash-rows"></tbody>
+    </table></div>
+    <p class="empty" id="trash-empty">The trash is empty.</p>
+  </section>
+
+  <section class="panel" id="form-top">
+    <h2>1. Choose the month</h2>
+    <p class="sub" id="editing">Adding a new month.</p>
+    <div class="form-grid">
+      <div class="field"><label for="pick">Month to edit</label><select id="pick"></select></div>
+      <div class="field"><label for="month">Month</label><input type="month" id="month"><span class="hint">Pick the reporting month.</span></div>
+      <div class="field"><label for="load">Load a different data file</label><input type="file" id="load" accept=".json,application/json"><span class="hint">Optional. The current file loads automatically.</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Search traffic</h2>
+    <div class="form-grid" id="f-main"></div>
+    <div id="warn-main"></div>
+  </section>
+
+  <section class="panel">
+    <h2>3. Devices and AI referrals</h2>
+    <p class="sub">Leave blank if you don't have it this month.</p>
+    <div class="form-grid" id="f-dev"></div>
+  </section>
+
+  <section class="panel">
+    <h2>4. Organic leads by page type</h2>
+    <div class="form-grid"><div class="field"><label for="leadTotal">Reported total leads</label><input type="number" id="leadTotal" step="any"></div></div>
+    <div id="lead-rows"></div>
+    <p style="margin:10px 0 0"><button type="button" class="btn secondary small" id="add-lead">Add page type</button></p>
+    <div id="warn-leads"></div>
+  </section>
+
+  <section class="panel">
+    <h2>5. Keyword rankings</h2>
+    <p class="sub">A new month starts with last month's keywords and blank positions. Add or remove keywords as your tracking list changes.</p>
+    <div class="form-grid"><div class="field"><label for="rankDate">Rank check date</label><input type="date" id="rankDate"></div></div>
+    <div id="kw-rows"></div>
+    <p style="margin:10px 0 0"><button type="button" class="btn secondary small" id="add-kw">Add keyword</button></p>
+  </section>
+
+  <section class="panel">
+    <h2>6. Save</h2>
+    <div class="controls">
+      <button type="button" class="btn" id="save">Save month</button>
+      <button type="button" class="btn secondary" id="download">Download months.json</button>
+    </div>
+    <div id="status"></div>
+    <ol class="steps">
+      <li>Press <b>Save month</b>. It is kept in this browser only.</li>
+      <li>Press <b>Download months.json</b>.</li>
+      <li>On GitHub, click <b>Add file</b>, then <b>Upload files</b>, and drop the new <code>months.json</code>. Then click <b>Commit changes</b>.</li>
+    </ol>
+    <details style="margin-top:14px"><summary class="sub" style="cursor:pointer">Preview file contents</summary><textarea id="preview" readonly aria-label="months.json preview"></textarea></details>
+  </section>
+</div>
+
+<div class="modal" id="confirm" hidden role="dialog" aria-modal="true" aria-labelledby="cf-title">
+  <div class="modal-box">
+    <h2 id="cf-title"></h2>
+    <p class="sub" id="cf-msg"></p>
+    <p>Type <b class="cf-code num" id="cf-code"></b> to confirm.</p>
+    <input type="number" id="cf-input" inputmode="numeric" aria-label="Confirmation number" autocomplete="off">
+    <div class="actions">
+      <button type="button" class="btn secondary" id="cf-cancel">Cancel</button>
+      <button type="button" class="btn danger" id="cf-ok" disabled>Confirm</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var DRAFT_KEY = "seo-dashboard-working-copy-v2";
+  var data = { site: { name: "" }, months: [], trash: [] };
+  var serverStr = "";
+
+  var MAIN = [
+    ["clicks", "Organic clicks", "Search Console total clicks"],
+    ["brandClicks", "Brand clicks", ""],
+    ["nonBrandClicks", "Non-brand clicks", ""],
+    ["organicSearchSessions", "Organic search sessions", "Analytics"],
+    ["totalOrganicSessions", "Total organic sessions", "Analytics"],
+    ["impressions", "Impressions", "Search Console"],
+    ["ctr", "Average CTR (%)", "For example 1.6"],
+    ["avgPosition", "Average position", "Search Console"],
+    ["healthScore", "SEO health score", "Out of 100"]
+  ];
+  var DEV = [["dev-desktop", "Desktop (%)"], ["dev-mobile", "Mobile (%)"], ["dev-tablet", "Tablet (%)"],
+             ["ai-ChatGPT", "ChatGPT referrals"], ["ai-Claude", "Claude referrals"], ["ai-Perplexity", "Perplexity referrals"]];
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function val(id) { var v = $(id).value.trim(); return v === "" ? null : Number(v); }
+  function nf(v) { return v === null || v === undefined ? "—" : Number(v).toLocaleString("en-IN"); }
+  function monthLabel(key) {
+    var p = key.split("-");
+    return new Date(Date.UTC(+p[0], +p[1] - 1, 1)).toLocaleString("en", { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+  function nextMonth(key) {
+    var p = key.split("-"), y = +p[0], m = +p[1] + 1;
+    if (m > 12) { m = 1; y++; }
+    return y + "-" + (m < 10 ? "0" : "") + m;
+  }
+  function dayText(iso) {
+    var d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  }
+  function field(id, label, hint) {
+    return '<div class="field"><label for="' + id + '">' + esc(label) + '</label><input type="number" id="' + id + '" step="any">' + (hint ? '<span class="hint">' + esc(hint) + "</span>" : "") + "</div>";
+  }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function normalize(d) {
+    d = d && typeof d === "object" ? d : {};
+    if (!d.site) d.site = { name: "" };
+    if (!Array.isArray(d.months)) d.months = [];
+    if (!Array.isArray(d.trash)) d.trash = [];
+    return d;
+  }
+
+  $("f-main").innerHTML = MAIN.map(function (f) { return field("f-" + f[0], f[1], f[2]); }).join("");
+  $("f-dev").innerHTML = DEV.map(function (f) { return field(f[0], f[1], ""); }).join("");
+
+  function sortMonths() { data.months.sort(function (a, b) { return a.month < b.month ? -1 : 1; }); }
+  function find(key) { for (var i = 0; i < data.months.length; i++) if (data.months[i].month === key) return data.months[i]; return null; }
+  function findTrash(key) { for (var i = 0; i < data.trash.length; i++) if (data.trash[i].month === key) return data.trash[i]; return null; }
+
+  function say(html, cls) {
+    var h = '<div class="' + (cls || "ok") + '">' + html + "</div>";
+    $("status").innerHTML = h; $("rep-msg").innerHTML = h;
+  }
+
+  /* ---- confirm with a random number from 10 to 100 ---- */
+  function askCode(opts) {
+    return new Promise(function (resolve) {
+      var code = 10 + Math.floor(Math.random() * 91);
+      var input = $("cf-input"), ok = $("cf-ok"), cancel = $("cf-cancel");
+      $("cf-title").textContent = opts.title;
+      $("cf-msg").textContent = opts.message;
+      $("cf-code").textContent = code;
+      ok.textContent = opts.confirmLabel || "Confirm";
+      input.value = ""; ok.disabled = true;
+      $("confirm").hidden = false;
+      input.focus();
+      function done(v) {
+        $("confirm").hidden = true;
+        input.removeEventListener("input", onIn);
+        ok.removeEventListener("click", onOk);
+        cancel.removeEventListener("click", onNo);
+        document.removeEventListener("keydown", onKey);
+        resolve(v);
+      }
+      function matches() { return input.value.trim() !== "" && Number(input.value) === code; }
+      function onIn() { ok.disabled = !matches(); }
+      function onOk() { if (matches()) done(true); }
+      function onNo() { done(false); }
+      function onKey(e) {
+        if (e.key === "Escape") done(false);
+        else if (e.key === "Enter" && matches()) done(true);
+      }
+      input.addEventListener("input", onIn);
+      ok.addEventListener("click", onOk);
+      cancel.addEventListener("click", onNo);
+      document.addEventListener("keydown", onKey);
+    });
+  }
+
+  /* ---- lists ---- */
+  function renderReports() {
+    var rows = data.months.slice().reverse().map(function (m) {
+      return '<tr><td><b>' + esc(m.label) + '</b></td><td class="r num">' + nf(m.clicks) + '</td><td class="r num">' + nf(m.leads ? m.leads.total : null) +
+        '</td><td class="r acts"><button type="button" class="btn secondary small" data-act="edit" data-m="' + esc(m.month) + '">Edit</button> ' +
+        '<button type="button" class="btn secondary small warn-text" data-act="delete" data-m="' + esc(m.month) + '">Delete</button></td></tr>';
+    }).join("");
+    $("rep-rows").innerHTML = rows || '<tr><td colspan="4" class="empty">No reports yet.</td></tr>';
+  }
+  function renderTrash() {
+    var rows = data.trash.slice().sort(function (a, b) { return (b.deletedAt || "") < (a.deletedAt || "") ? -1 : 1; }).map(function (m) {
+      return '<tr><td><b>' + esc(m.label) + '</b></td><td>' + esc(dayText(m.deletedAt)) +
+        '</td><td class="r acts"><button type="button" class="btn secondary small" data-act="restore" data-m="' + esc(m.month) + '">Restore</button> ' +
+        '<button type="button" class="btn secondary small warn-text" data-act="purge" data-m="' + esc(m.month) + '">Delete forever</button></td></tr>';
+    }).join("");
+    $("trash-rows").innerHTML = rows;
+    $("trash-empty").hidden = data.trash.length > 0;
+  }
+  function updatePub() { $("pubbar").hidden = JSON.stringify(data) === serverStr; }
+  function persist() { try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {} }
+
+  function refreshPick(selected) {
+    sortMonths();
+    $("pick").innerHTML = '<option value="__new">New month</option>' + data.months.slice().reverse().map(function (m) {
+      return '<option value="' + esc(m.month) + '">' + esc(m.label) + "</option>";
+    }).join("");
+    $("pick").value = selected && (selected === "__new" || find(selected)) ? selected : "__new";
+    $("preview").value = JSON.stringify(data, null, 2);
+    renderReports(); renderTrash(); updatePub();
+  }
+  function commit(selected) { persist(); refreshPick(selected); }
+
+  /* ---- rows ---- */
+  function leadRow(name, v) {
+    return '<div class="list-row leads"><input type="text" class="l-name" value="' + esc(name) + '" aria-label="Page type" placeholder="Page type">' +
+      '<input type="number" class="l-val" step="any" value="' + (v === null || v === undefined ? "" : v) + '" aria-label="Leads">' +
+      '<button type="button" class="btn secondary small rm" aria-label="Remove row">Remove</button></div>';
+  }
+  function kwRow(k, vol, pos) {
+    return '<div class="list-row"><input type="text" class="k-name" value="' + esc(k) + '" aria-label="Keyword" placeholder="Keyword">' +
+      '<input type="number" class="k-vol" step="any" value="' + (vol === null || vol === undefined ? "" : vol) + '" aria-label="Monthly searches" placeholder="Searches">' +
+      '<input type="number" class="k-pos" step="any" value="' + (pos === null || pos === undefined ? "" : pos) + '" aria-label="Position" placeholder="Position">' +
+      '<button type="button" class="btn secondary small rm" aria-label="Remove row">Remove</button></div>';
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".rm");
+    if (b) { b.parentNode.parentNode.removeChild(b.parentNode); checks(); }
+  });
+  $("add-lead").addEventListener("click", function () { $("lead-rows").insertAdjacentHTML("beforeend", leadRow("", null)); });
+  $("add-kw").addEventListener("click", function () { $("kw-rows").insertAdjacentHTML("beforeend", kwRow("", null, null)); });
+
+  /* ---- fill the form ---- */
+  function clearForm() {
+    document.querySelectorAll(".form-grid input[type=number]").forEach(function (i) { i.value = ""; });
+    $("lead-rows").innerHTML = ""; $("kw-rows").innerHTML = ""; $("rankDate").value = "";
+  }
+  function fill(m) {
+    clearForm();
+    $("editing").textContent = "Editing " + m.label + ". Change the figures, then press Save month.";
+    $("month").value = m.month;
+    MAIN.forEach(function (f) { var v = m[f[0]]; $("f-" + f[0]).value = v === null || v === undefined ? "" : v; });
+    var d = m.devices || {};
+    ["desktop", "mobile", "tablet"].forEach(function (k) { $("dev-" + k).value = d[k] === undefined || d[k] === null ? "" : d[k]; });
+    var a = m.aiReferrals || {};
+    ["ChatGPT", "Claude", "Perplexity"].forEach(function (k) { $("ai-" + k).value = a[k] === undefined || a[k] === null ? "" : a[k]; });
+    $("leadTotal").value = m.leads && m.leads.total !== null && m.leads.total !== undefined ? m.leads.total : "";
+    var bp = m.leads ? m.leads.byPage || {} : {};
+    $("lead-rows").innerHTML = Object.keys(bp).map(function (k) { return leadRow(k, bp[k]); }).join("");
+    var r = m.rankings || { date: "", items: [] };
+    $("rankDate").value = r.date || "";
+    $("kw-rows").innerHTML = (r.items || []).map(function (i) { return kwRow(i.keyword, i.volume, i.position); }).join("");
+    checks();
+  }
+  function fillNew() {
+    clearForm();
+    $("editing").textContent = "Adding a new month.";
+    var last = data.months.length ? data.months[data.months.length - 1] : null;
+    $("month").value = last ? nextMonth(last.month) : "";
+    if (last) {
+      var bp = last.leads ? last.leads.byPage || {} : {};
+      $("lead-rows").innerHTML = Object.keys(bp).map(function (k) { return leadRow(k, null); }).join("");
+      $("kw-rows").innerHTML = ((last.rankings && last.rankings.items) || []).map(function (i) { return kwRow(i.keyword, i.volume, null); }).join("");
+    } else {
+      ["Blogs", "Home page", "Service pages", "Pricing page", "Contact page"].forEach(function (k) { $("lead-rows").insertAdjacentHTML("beforeend", leadRow(k, null)); });
+    }
+    checks();
+  }
+  $("pick").addEventListener("change", function () {
+    var m = this.value === "__new" ? null : find(this.value);
+    if (m) fill(m); else fillNew();
+  });
+
+  /* ---- report actions ---- */
+  function scrollToForm() { var el = $("form-top"); if (!el || !el.scrollIntoView) return; try { el.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {} }
+  function editMonth(key) {
+    var m = find(key); if (!m) return;
+    $("pick").value = key; fill(m); scrollToForm();
+  }
+  function deleteMonth(key) {
+    var m = find(key); if (!m) return;
+    askCode({ title: "Move " + m.label + " to the trash?", message: "You can restore it from the Trash later.", confirmLabel: "Move to trash" }).then(function (ok) {
+      if (!ok) return;
+      data.months.splice(data.months.indexOf(m), 1);
+      var t = clone(m); t.deletedAt = new Date().toISOString();
+      data.trash = data.trash.filter(function (x) { return x.month !== key; });
+      data.trash.push(t);
+      commit("__new"); fillNew();
+      say(m.label + " moved to the trash. Download months.json and upload it to GitHub to publish this.");
+    });
+  }
+  function restoreMonth(key) {
+    var t = findTrash(key); if (!t) return;
+    if (find(key)) { say("A report for " + esc(t.label) + " already exists. Edit that one, or delete it first.", "warn"); return; }
+    var m = clone(t); delete m.deletedAt;
+    data.trash.splice(data.trash.indexOf(t), 1);
+    data.months.push(m);
+    commit(key); fill(m);
+    say(m.label + " restored. Download months.json and upload it to GitHub to publish this.");
+  }
+  function purgeMonth(key) {
+    var t = findTrash(key); if (!t) return;
+    askCode({ title: "Delete " + t.label + " forever?", message: "This cannot be undone.", confirmLabel: "Delete forever" }).then(function (ok) {
+      if (!ok) return;
+      data.trash.splice(data.trash.indexOf(t), 1);
+      commit($("pick").value);
+      say(t.label + " deleted forever. Download months.json and upload it to GitHub to publish this.");
+    });
+  }
+  function onAct(e) {
+    var b = e.target.closest("button[data-act]");
+    if (!b) return;
+    var k = b.getAttribute("data-m"), a = b.getAttribute("data-act");
+    if (a === "edit") editMonth(k);
+    else if (a === "delete") deleteMonth(k);
+    else if (a === "restore") restoreMonth(k);
+    else if (a === "purge") purgeMonth(k);
+  }
+  $("rep-rows").addEventListener("click", onAct);
+  $("trash-rows").addEventListener("click", onAct);
+  $("new-report").addEventListener("click", function () { $("pick").value = "__new"; fillNew(); scrollToForm(); });
+
+  /* ---- read the form ---- */
+  function readForm() {
+    var key = $("month").value;
+    if (!/^\d{4}-\d{2}$/.test(key)) return null;
+    var m = { month: key, label: monthLabel(key) };
+    MAIN.forEach(function (f) { m[f[0]] = val("f-" + f[0]); });
+    var dv = { desktop: val("dev-desktop"), mobile: val("dev-mobile"), tablet: val("dev-tablet") };
+    m.devices = (dv.desktop === null && dv.mobile === null && dv.tablet === null) ? null : dv;
+    var ai = { ChatGPT: val("ai-ChatGPT"), Claude: val("ai-Claude"), Perplexity: val("ai-Perplexity") };
+    m.aiReferrals = (ai.ChatGPT === null && ai.Claude === null && ai.Perplexity === null) ? null : ai;
+    var byPage = {};
+    document.querySelectorAll("#lead-rows .list-row").forEach(function (r) {
+      var nm = r.querySelector(".l-name").value.trim(), v = r.querySelector(".l-val").value.trim();
+      if (nm && v !== "") byPage[nm] = Number(v);
+    });
+    m.leads = { total: val("leadTotal"), byPage: byPage };
+    var items = [];
+    document.querySelectorAll("#kw-rows .list-row").forEach(function (r) {
+      var k = r.querySelector(".k-name").value.trim(), v = r.querySelector(".k-vol").value.trim(), p = r.querySelector(".k-pos").value.trim();
+      if (k && p !== "") items.push({ keyword: k, volume: v === "" ? null : Number(v), position: Number(p) });
+    });
+    m.rankings = { date: $("rankDate").value || null, items: items };
+    return m;
+  }
+
+  function checks() {
+    var m = readForm();
+    $("warn-main").innerHTML = ""; $("warn-leads").innerHTML = "";
+    if (!m) return;
+    if (m.clicks !== null && m.brandClicks !== null && m.nonBrandClicks !== null && m.brandClicks + m.nonBrandClicks !== m.clicks) {
+      $("warn-main").innerHTML = '<div class="warn">Brand + non-brand clicks add up to ' + (m.brandClicks + m.nonBrandClicks) + ", but total clicks is " + m.clicks + ". Check these three figures.</div>";
+    }
+    var sum = 0, cnt = 0;
+    Object.keys(m.leads.byPage).forEach(function (k) { sum += m.leads.byPage[k]; cnt++; });
+    if (cnt && m.leads.total !== null && sum !== m.leads.total) {
+      $("warn-leads").innerHTML = '<div class="warn">The page rows add up to ' + sum + ", but the reported total is " + m.leads.total + ". Fix the rows or the total before saving.</div>";
+    }
+  }
+  document.addEventListener("input", function (e) { if (e.target.id !== "cf-input") checks(); });
+
+  /* ---- save / download ---- */
+  $("save").addEventListener("click", function () {
+    var m = readForm();
+    if (!m) { say("Choose a month first.", "warn"); return; }
+    if (m.clicks === null) { say("Enter the organic clicks first. A report needs at least that figure.", "warn"); return; }
+    var old = find(m.month);
+    if (old) data.months[data.months.indexOf(old)] = m; else data.months.push(m);
+    commit(m.month); $("editing").textContent = "Editing " + m.label + ".";
+    say(m.label + " saved in this browser. It will not show on the dashboard until you download months.json and upload it to GitHub.");
+  });
+  function download() {
+    var blob = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "months.json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+  $("download").addEventListener("click", download);
+  $("download-top").addEventListener("click", download);
+  $("load").addEventListener("change", function () {
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var j = JSON.parse(rd.result); if (!j.months) throw new Error("no months");
+        data = normalize(j); commit("__new"); fillNew();
+        say("Loaded " + data.months.length + " months from " + esc(f.name) + ".");
+      } catch (err) { say("That file isn't a valid months.json.", "warn"); }
+    };
+    rd.readAsText(f);
+  });
+
+  function fetchData() {
+    var urls = ["months.json", "data/months.json"];
+    function tryAt(i) {
+      return fetch(urls[i] + "?_=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .catch(function (e) { if (i + 1 < urls.length) return tryAt(i + 1); throw e; });
+    }
+    return tryAt(0);
+  }
+
+  /* ---- start ---- */
+  function start(serverData) {
+    serverData = normalize(serverData);
+    serverStr = JSON.stringify(serverData);
+    data = clone(serverData);
+    var draft = null;
+    try { draft = normalize(JSON.parse(localStorage.getItem(DRAFT_KEY) || "null")); } catch (e) { draft = null; }
+    if (draft && draft.months.length && JSON.stringify(draft) !== serverStr) {
+      data = draft;
+      $("draft").innerHTML = '<div class="warn">Showing changes saved in this browser that are not on the server yet. <button type="button" class="btn secondary small" id="discard">Discard them and use the server file</button></div>';
+      $("discard").addEventListener("click", function () {
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+        $("draft").innerHTML = ""; data = clone(serverData); refreshPick("__new"); fillNew();
+      });
+    }
+    refreshPick("__new"); fillNew();
+  }
+  fetchData()
+    .then(start)
+    .catch(function () { start({ site: { name: "" }, months: [], trash: [] }); say("Could not load months.json. Open this page through a web server, or load the file above.", "warn"); });
+})();
+
+</script>
+</body>
+</html>
